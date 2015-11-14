@@ -1,3 +1,11 @@
+
+import ProjectExceptions.IncorrectFileTypeException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import javax.swing.JOptionPane;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -26,6 +34,7 @@ public class MainWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jFileChooser1 = new javax.swing.JFileChooser();
         jPanelPointChart = new javax.swing.JPanel();
         jPanelGlobalButtons = new javax.swing.JPanel();
         jPanelAddPoints = new javax.swing.JPanel();
@@ -36,6 +45,7 @@ public class MainWindow extends javax.swing.JFrame {
         jTable1 = new javax.swing.JTable();
         jButtonAddPoint = new javax.swing.JButton();
         jButtonReadFromFile = new javax.swing.JButton();
+        jButtonDeletePoints = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -96,17 +106,17 @@ public class MainWindow extends javax.swing.JFrame {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null}
+
             },
             new String [] {
                 "Lp.", "X", "Y", "delete"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Double.class, java.lang.Double.class, java.lang.Object.class
+                java.lang.Integer.class, java.lang.Double.class, java.lang.Double.class, java.lang.Boolean.class
             };
             boolean[] canEdit = new boolean [] {
-                false, true, true, false
+                false, true, true, true
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -127,6 +137,18 @@ public class MainWindow extends javax.swing.JFrame {
         });
 
         jButtonReadFromFile.setText("Wczytaj z pliku");
+        jButtonReadFromFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonReadFromFileActionPerformed(evt);
+            }
+        });
+
+        jButtonDeletePoints.setText("Usuń wybrane punkty");
+        jButtonDeletePoints.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonDeletePointsActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -139,11 +161,15 @@ public class MainWindow extends javax.swing.JFrame {
                         .addGap(61, 61, 61)
                         .addComponent(jLabelTitlePointsPanel))
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addComponent(jButtonAddPoint)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButtonReadFromFile))
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jButtonReadFromFile, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addComponent(jButtonAddPoint)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(jButtonDeletePoints)))
+                            .addGap(0, 0, Short.MAX_VALUE))))
                 .addGap(25, 25, 25))
         );
         jPanel1Layout.setVerticalGroup(
@@ -156,8 +182,10 @@ public class MainWindow extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonAddPoint)
-                    .addComponent(jButtonReadFromFile))
-                .addContainerGap(143, Short.MAX_VALUE))
+                    .addComponent(jButtonDeletePoints))
+                .addGap(28, 28, 28)
+                .addComponent(jButtonReadFromFile)
+                .addContainerGap(91, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -179,7 +207,7 @@ public class MainWindow extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanelPointChart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanelGlobalButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -191,7 +219,37 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void jButtonAddPointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddPointActionPerformed
         // TODO add your handling code here:
+        MainWindowLogic.addRowToTable(jTable1);
     }//GEN-LAST:event_jButtonAddPointActionPerformed
+
+    private void jButtonReadFromFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonReadFromFileActionPerformed
+        // TODO add your handling code here:
+        try {
+            int returnVal = jFileChooser1.showOpenDialog(this);
+            if (returnVal == jFileChooser1.APPROVE_OPTION) {
+                File file = jFileChooser1.getSelectedFile();
+                MainWindowLogic.isTextFile(file);
+                //TODO wczytywanie pliku do tabeli
+
+            } else {
+                System.out.println("File access cancelled by user.");
+            }
+        } catch (IncorrectFileTypeException incExcp) {
+            System.out.println(incExcp);
+            JOptionPane.showMessageDialog(this, "Wybrany plik nie jest plikiem tekstowym!", "Błąd wczytywania pliku", JOptionPane.ERROR_MESSAGE);
+        } catch (FileNotFoundException e) {
+            System.out.println(e);
+            JOptionPane.showMessageDialog(this, "Nie można znaleźć pliku pod danym adresem!", "Błąd wczytywania pliku", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException e) {
+            System.out.println(e);
+            JOptionPane.showMessageDialog(this, "Nie mogę wczytać pliku! Sprawdź uprawnienia!", "Błąd wczytywania pliku", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jButtonReadFromFileActionPerformed
+
+    private void jButtonDeletePointsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeletePointsActionPerformed
+        // TODO add your handling code here:
+        MainWindowLogic.deleteSelectedRow(jTable1);
+    }//GEN-LAST:event_jButtonDeletePointsActionPerformed
 
     /**
      * @param args the command line arguments
@@ -230,8 +288,10 @@ public class MainWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAddPoint;
+    private javax.swing.JButton jButtonDeletePoints;
     private javax.swing.JButton jButtonNextWindow;
     private javax.swing.JButton jButtonReadFromFile;
+    private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabelTitlePointsPanel;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanelAddPoints;
