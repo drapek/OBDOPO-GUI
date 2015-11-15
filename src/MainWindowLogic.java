@@ -52,7 +52,7 @@ public class MainWindowLogic {
     
     static void deleteSelectedRow(JTable where) {
         DefaultTableModel tmp = (DefaultTableModel) where.getModel();
-        System.out.println("Wlk tabeli: " + tmp.getRowCount());
+        System.out.println("Wielkość tabeli przed usunięciem: " + tmp.getRowCount());
         for(int i = 0; i < tmp.getRowCount(); i++) {
             boolean result = (boolean) tmp.getValueAt(i, 3);
             if( result ) {
@@ -60,7 +60,7 @@ public class MainWindowLogic {
             }
             
         }
-        
+        System.out.println("Wielkość tabeli po usunięciu: " + tmp.getRowCount() );
         //TODO naprawić numeracje tabeli
         ponumerujWiersze(where);
     }
@@ -68,8 +68,8 @@ public class MainWindowLogic {
     static private void ponumerujWiersze(JTable where) {
         DefaultTableModel tmp = (DefaultTableModel) where.getModel();
         for(int i = 0; i < tmp.getRowCount(); i++) {
-            String val = (i++) + ".";
-            tmp.setValueAt("1", i, 0);
+            String val = (i + 1) + ".";
+            tmp.setValueAt(val, i, 0);
             
             
         }
