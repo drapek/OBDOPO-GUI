@@ -1,3 +1,6 @@
+
+import javax.swing.JFrame;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -12,8 +15,10 @@ public class FindHullWindow extends javax.swing.JFrame {
 
     /**
      * Creates new form MainWindow
+     * @param forwaredDataPackage
      */
-    public FindHullWindow() {
+    public FindHullWindow(ForwardingDataPackage forwaredDataPackage) {
+        FindHullWindowLogic.setImportedPointsFromReader(forwaredDataPackage.getPointsCollection());
         initComponents();
     }
 
@@ -72,6 +77,11 @@ public class FindHullWindow extends javax.swing.JFrame {
         jButtonNextWindow.setText("Przejdź dalej");
 
         jButtonPreviosWindow.setText("Cofnij");
+        jButtonPreviosWindow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonPreviosWindowActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelGlobalButtonsLayout = new javax.swing.GroupLayout(jPanelGlobalButtons);
         jPanelGlobalButtons.setLayout(jPanelGlobalButtonsLayout);
@@ -249,6 +259,15 @@ public class FindHullWindow extends javax.swing.JFrame {
     private void jButtonFindingHullResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFindingHullResetActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButtonFindingHullResetActionPerformed
+
+    private void jButtonPreviosWindowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPreviosWindowActionPerformed
+        ForwardingDataPackage frwdData = new ForwardingDataPackage();
+        frwdData.setPointsCollection(FindHullWindowLogic.getImportedPointsFromReader());
+        MainWindow newWindow = new MainWindow(frwdData);
+        newWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        newWindow.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_jButtonPreviosWindowActionPerformed
 
     /**
      * @param args the command line arguments

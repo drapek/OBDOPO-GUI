@@ -1,4 +1,4 @@
-import com.sun.media.sound.InvalidFormatException;
+import ProjectExceptions.InvalidFormatInFileException;
 
 import java.awt.geom.Point2D;
 import java.io.*;
@@ -14,7 +14,7 @@ public class ReadPointsFromFile {
         readedFile = new FileReader(path);
     }
 
-    public Point2D [] readPoints() throws InvalidFormatException, NumberFormatException, IOException {
+    public Point2D [] readPoints() throws InvalidFormatInFileException, IOException {
         BufferedReader reader = new BufferedReader(readedFile);
         String line;
         ArrayList <Point2D> readedPoints = new ArrayList<>();
@@ -23,7 +23,7 @@ public class ReadPointsFromFile {
             String [] coordinatsXY = line.split(" ");
 
             if(coordinatsXY.length != 2 )
-                throw new InvalidFormatException();
+                throw new InvalidFormatInFileException();
             else {
                 //check if readed strings are numbers
                 if(coordinatsXY[0].matches(".*\\d.*") && coordinatsXY[1].matches(".*\\d.*")) {
@@ -34,7 +34,7 @@ public class ReadPointsFromFile {
                     readedPoints.add(tmpPoint);
 
                 } else
-                    throw new InvalidFormatException();
+                    throw new InvalidFormatInFileException();
 
             }
 
@@ -54,7 +54,7 @@ public class ReadPointsFromFile {
             ReadPointsFromFile testRead = new ReadPointsFromFile("./TestFiles/points_goodFormat.txt");
             points = testRead.readPoints();
 
-        } catch (InvalidFormatException ex) {
+        } catch (InvalidFormatInFileException ex) {
             System.out.println("Użyłeś złego formatu we wprowadzanym pliku!");
         } catch (IOException ex) {
             System.out.println("Nie moge otworzyć pliku! Sprawdź czy podana ścieżka jest poprawna!");
@@ -72,7 +72,7 @@ public class ReadPointsFromFile {
             ReadPointsFromFile testRead = new ReadPointsFromFile("./TestFiles/points_wrongFormat.txt");
             points = testRead.readPoints();
 
-        } catch (InvalidFormatException ex) {
+        } catch (InvalidFormatInFileException ex) {
             System.out.println("Użyłeś złego formatu we wprowadzanym pliku!");
         } catch (IOException ex) {
             System.out.println("Nie moge otworzyć pliku! Sprawdź czy podana ścieżka jest poprawna!");

@@ -1,9 +1,11 @@
 
 import ProjectExceptions.IncorrectFileTypeException;
+import ProjectExceptions.InvalidFormatInFileException;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 /*
@@ -23,6 +25,11 @@ public class MainWindow extends javax.swing.JFrame {
      */
     public MainWindow() {
         initComponents();
+    }
+    
+    public MainWindow(ForwardingDataPackage forwData) {
+        initComponents();
+        MainWindowLogic.inputValuesIntoTableFromDataForwarder(forwData.getPointsCollection(), jTable1);
     }
 
     /**
@@ -74,6 +81,11 @@ public class MainWindow extends javax.swing.JFrame {
         );
 
         jButtonNextWindow.setText("Przejdź dalej");
+        jButtonNextWindow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonNextWindowActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelGlobalButtonsLayout = new javax.swing.GroupLayout(jPanelGlobalButtons);
         jPanelGlobalButtons.setLayout(jPanelGlobalButtonsLayout);
@@ -225,15 +237,19 @@ public class MainWindow extends javax.swing.JFrame {
     private void jButtonReadFromFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonReadFromFileActionPerformed
         // TODO add your handling code here:
         try {
+            File file = null;
             int returnVal = jFileChooser1.showOpenDialog(this);
             if (returnVal == jFileChooser1.APPROVE_OPTION) {
-                File file = jFileChooser1.getSelectedFile();
+                file = jFileChooser1.getSelectedFile();
                 MainWindowLogic.isTextFile(file);
-                //TODO wczytywanie pliku do tabeli
+                MainWindowLogic.readPointsFile( file, jTable1);
 
             } else {
                 System.out.println("File access cancelled by user.");
             }
+            
+            
+            
         } catch (IncorrectFileTypeException incExcp) {
             System.out.println(incExcp);
             JOptionPane.showMessageDialog(this, "Wybrany plik nie jest plikiem tekstowym!", "Błąd wczytywania pliku", JOptionPane.ERROR_MESSAGE);
@@ -243,13 +259,36 @@ public class MainWindow extends javax.swing.JFrame {
         } catch (IOException e) {
             System.out.println(e);
             JOptionPane.showMessageDialog(this, "Nie mogę wczytać pliku! Sprawdź uprawnienia!", "Błąd wczytywania pliku", JOptionPane.ERROR_MESSAGE);
+        } catch (InvalidFormatInFileException e) {
+            System.out.println(e);
+            JOptionPane.showMessageDialog(this, "Podany plik ma niepoprawny format wewnętrzny. Powinien on wyglądać następująco \n 5.0 3.2\n 2.1 2.2\n itd.", "Błąd wczytywania pliku", JOptionPane.ERROR_MESSAGE);
         }
+        
+        
     }//GEN-LAST:event_jButtonReadFromFileActionPerformed
 
     private void jButtonDeletePointsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeletePointsActionPerformed
-        // TODO add your handling code here:
+
         MainWindowLogic.deleteSelectedRow(jTable1);
     }//GEN-LAST:event_jButtonDeletePointsActionPerformed
+
+    private void jButtonNextWindowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNextWindowActionPerformed
+
+        Point2D [] forwardThisPoints = MainWindowLogic.rewritePointsTableWitoutDuplicats(jTable1);
+        
+        if( forwardThisPoints.length < 3) {
+            JOptionPane.showMessageDialog(this, "Aby móc znaleźć otoczkę potrzebne są conjamiej 3 punkty!", "Błąd - zbyt mało punktów!", JOptionPane.ERROR_MESSAGE);
+        } 
+        else {
+            ForwardingDataPackage dataForwarding = new ForwardingDataPackage();
+            dataForwarding.setPointsCollection(forwardThisPoints);
+            
+            FindHullWindow newWindow = new FindHullWindow(dataForwarding);
+            newWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            newWindow.setVisible(true);
+            this.setVisible(false);
+        }
+    }//GEN-LAST:event_jButtonNextWindowActionPerformed
 
     /**
      * @param args the command line arguments
