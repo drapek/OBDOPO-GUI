@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -25,11 +27,14 @@ public class MainWindow extends javax.swing.JFrame {
      */
     public MainWindow() {
         initComponents();
+        jTableValueChangedInitListener();
     }
     
     public MainWindow(ForwardingDataPackage forwData) {
         initComponents();
+        jTableValueChangedInitListener();
         MainWindowLogic.inputValuesIntoTableFromDataForwarder(forwData.getPointsCollection(), jTable1);
+        
     }
 
     /**
@@ -139,6 +144,13 @@ public class MainWindow extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        jTable1.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
+                jTable1InputMethodTextChanged(evt);
+            }
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
         jButtonAddPoint.setText("Dodaj Punkt");
@@ -230,12 +242,22 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonAddPointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddPointActionPerformed
-        // TODO add your handling code here:
+
         MainWindowLogic.addRowToTable(jTable1);
     }//GEN-LAST:event_jButtonAddPointActionPerformed
+    
+    private void jTableValueChangedInitListener() {
+        jTable1.getModel().addTableModelListener(new TableModelListener() {
+            @Override
+            synchronized public void tableChanged(TableModelEvent e) {
+                MainWindowLogic.drawXYChart(jPanelPointChart, jTable1);
+            }
 
+  
+        });
+    }
     private void jButtonReadFromFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonReadFromFileActionPerformed
-        // TODO add your handling code here:
+
         try {
             File file = null;
             int returnVal = jFileChooser1.showOpenDialog(this);
@@ -287,8 +309,13 @@ public class MainWindow extends javax.swing.JFrame {
             newWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             newWindow.setVisible(true);
             this.setVisible(false);
+            dispose();
         }
     }//GEN-LAST:event_jButtonNextWindowActionPerformed
+
+    private void jTable1InputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_jTable1InputMethodTextChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTable1InputMethodTextChanged
 
     /**
      * @param args the command line arguments

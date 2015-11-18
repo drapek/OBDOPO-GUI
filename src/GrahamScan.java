@@ -135,14 +135,20 @@ public class GrahamScan {
             ex.printStackTrace();
         }
 
-        Point2D [] testPoints2 = new Point2D[7];
-        testPoints2[0] = new Point2D.Double(5, 7);
+        Point2D [] testPoints2 = new Point2D[3];
+        /*testPoints2[0] = new Point2D.Double(5, 7);
         testPoints2[1] = new Point2D.Double(0, 5);
         testPoints2[2] = new Point2D.Double(3, 8);
         testPoints2[3] = new Point2D.Double(9, 10);
         testPoints2[4] = new Point2D.Double(7, 5);
         testPoints2[5] = new Point2D.Double(10, 2);
-        testPoints2[6] = new Point2D.Double(1, 1);
+        testPoints2[6] = new Point2D.Double(1, 1);/*
+        */
+        
+        testPoints2[0] = new Point2D.Double(4, 16);
+        testPoints2[1] = new Point2D.Double(17, 13);
+        testPoints2[2] = new Point2D.Double(15, 9);
+        
 
         try {
             System.out.println();

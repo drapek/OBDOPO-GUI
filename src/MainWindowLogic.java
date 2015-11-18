@@ -1,14 +1,24 @@
 
 import java.io.File;
 import ProjectExceptions.*;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -58,6 +68,7 @@ public class MainWindowLogic {
             boolean result = (boolean) tmp.getValueAt(i, 3);
             if( result ) {
                 tmp.removeRow(i);
+                i--;
             }
             
         }
@@ -128,4 +139,50 @@ public class MainWindowLogic {
             tmp.addRow(new Object[]{(tmp.getRowCount() + 1) + ".", point.getX(), point.getY(), false});
         }
     }
+    
+    static void drawXYChart(JPanel panelWhenInside, JTable pointsCollector) {
+        panelWhenInside.setLayout(new java.awt.BorderLayout());
+
+        //TODO 
+        XYSeries seriersAllPoints = new XYSeries("All points");
+        addPointsToSeries(seriersAllPoints, pointsCollector);
+
+        // Add the seriersAllPoints to your data set
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        dataset.addSeries(seriersAllPoints);
+
+        // Generate the graph
+        JFreeChart chart = ChartFactory.createXYLineChart(
+                null, // Title
+                null, // x-axis Label
+                null, // y-axis Label
+                dataset, // Dataset
+                PlotOrientation.VERTICAL, // Plot Orientation
+                false, // Show Legend
+                false, // Use tooltips
+                false // Configure chart to generate URLs?
+        );
+
+        final XYPlot plot = chart.getXYPlot();
+        ChartPanel chartPanel = new ChartPanel(chart);
+        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        renderer.setSeriesPaint(0, Color.BLACK);
+        renderer.setSeriesLinesVisible(0, false);
+        renderer.setSeriesStroke( 0 , new BasicStroke( 4.0f ) );
+
+        plot.setRenderer(renderer);
+        
+        panelWhenInside.add(chartPanel, BorderLayout.CENTER);
+        panelWhenInside.validate();
+        
+
+    }
+    
+    static private void addPointsToSeries(XYSeries seriesDestination, JTable jTableSource ) {
+        DefaultTableModel defaultModelOfJTable = (DefaultTableModel) jTableSource.getModel();
+        for(int i = 0; i < defaultModelOfJTable.getRowCount(); i++) {
+            seriesDestination.add( (double) defaultModelOfJTable.getValueAt(i, 1), (double) defaultModelOfJTable.getValueAt(i, 2));
+        }
+    }
+
 }

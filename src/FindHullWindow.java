@@ -18,8 +18,10 @@ public class FindHullWindow extends javax.swing.JFrame {
      * @param forwaredDataPackage
      */
     public FindHullWindow(ForwardingDataPackage forwaredDataPackage) {
-        FindHullWindowLogic.setImportedPointsFromReader(forwaredDataPackage.getPointsCollection());
         initComponents();
+        FindHullWindowLogic.setImportedPointsFromReader(forwaredDataPackage.getPointsCollection());
+        FindHullWindowLogic.drawPointsOnChart(jPanelPointChart);
+       
     }
 
     /**
@@ -267,6 +269,7 @@ public class FindHullWindow extends javax.swing.JFrame {
         newWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         newWindow.setVisible(true);
         this.setVisible(false);
+        dispose();
     }//GEN-LAST:event_jButtonPreviosWindowActionPerformed
 
     /**
