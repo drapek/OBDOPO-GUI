@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+  <NonVisualComponents>
+    <Container class="javax.swing.JTabbedPane" name="jTabbedPane1">
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
+    </Container>
+  </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
   </Properties>
@@ -132,6 +138,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Przejd&#x17a; dalej"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonNextWindowActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonPreviosWindow">
           <Properties>
@@ -252,8 +261,8 @@
                 <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
                   <Table columnCount="3" rowCount="1">
                     <Column editable="false" title="Lp." type="java.lang.Integer"/>
-                    <Column editable="true" title="X" type="java.lang.Double"/>
-                    <Column editable="true" title="Y" type="java.lang.Double"/>
+                    <Column editable="false" title="X" type="java.lang.Double"/>
+                    <Column editable="false" title="Y" type="java.lang.Double"/>
                   </Table>
                 </Property>
                 <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
@@ -294,6 +303,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Stop"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonStopFindingHullActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel1">
           <Properties>
@@ -301,16 +313,26 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JSpinner" name="jSpinner1">
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="jSpinner1.setValue(1);"/>
+          </AuxValues>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonFindingHullNextStep">
           <Properties>
             <Property name="text" type="java.lang.String" value="Kolejny krok"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonFindingHullNextStepActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonFindingHullFinish">
           <Properties>
             <Property name="text" type="java.lang.String" value="Id&#x17a; do ko&#x144;ca"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonFindingHullFinishActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonFindingHullReset">
           <Properties>

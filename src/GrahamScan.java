@@ -10,11 +10,8 @@ public class GrahamScan {
     private ArrayList <Point2D> pointsCollection;
     private ArrayList <Point2D> convexHull;
     private Point2D minimalYPoint;
+    private int actualStepInGrahamScan;
 
-    /**
-         @param inputArr must have at less 3 Points2D object
-         @throws ToFewPointsToFindConvexHullException exception if inputArr has less than 3 points
-     */
     public GrahamScan(Point2D [] inputArr) throws ToFewPointsToFindConvexHullException {
         if (inputArr.length > 2 ) {
             pointsCollection = new ArrayList<Point2D>(Arrays.asList(inputArr));
@@ -23,35 +20,61 @@ public class GrahamScan {
             throw new ToFewPointsToFindConvexHullException();
         }
     }
-
-    /**
-     * @return tops points of found polygon
-     */
-    public ArrayList <Point2D> findHull() {
-
+    
+    public ArrayList <Point2D> getConvexHull() {
+        return convexHull;
+    }
+    
+    
+    public void initGrahamScanAlgorithm() {
+        //prepere data for algorithm
         minimalYPoint = pullOutMinimalYXpoint();
         sortPointsByPolarAngle(pointsCollection);
         convexHull = new ArrayList<>();
-        grahamScanAlgorithm();
-
-        return convexHull;
-    }
-
-    private void grahamScanAlgorithm() {
+        
+        //prepere enivorment for algorimt
         convexHull.add(minimalYPoint);
         convexHull.add(pointsCollection.get(0));
         convexHull.add(pointsCollection.get(1));
-
-        for( int i = 2; i < pointsCollection.size(); i++) {
-            while( calculateDetBySarrusMethod(convexHull.get(convexHull.size() - 2),
-                                              convexHull.get(convexHull.size() - 1),
-                                              pointsCollection.get(i))
+        actualStepInGrahamScan = 2;
+    }
+    
+    /**
+     * 
+     * @param stepNmb step number in finding hull algorithm
+     * @return false if finding is done 
+     */
+    public boolean makeFewStepsInGrahamScan(int stepNmb) {
+        for(int i = 0; i < stepNmb; i++) {
+            if( !makeOneStepInGrahamScanAlgoritm() ) {
+                convexHull.add(convexHull.get(0)); //to make nice loop on chart while drawning
+                return false;
+                
+            }
+        }
+        return true;
+        
+    }
+    
+    private boolean makeOneStepInGrahamScanAlgoritm() {
+        while( calculateDetBySarrusMethod(convexHull.get(convexHull.size() - 2),
+                                          convexHull.get(convexHull.size() - 1),
+                                          pointsCollection.get(actualStepInGrahamScan))
                     < 0){
                 //so if the third element is at the right side of vector [first, second]
                 convexHull.remove(convexHull.size() - 1);
             }
-            convexHull.add(pointsCollection.get(i));
-        }
+            convexHull.add(pointsCollection.get(actualStepInGrahamScan));
+        
+        actualStepInGrahamScan++;
+        
+        
+            //if hull is found inform about that
+         if( actualStepInGrahamScan == pointsCollection.size() )
+             return false;
+         else 
+             return true;
+        
     }
 
     private double calculateDetBySarrusMethod(Point2D a, Point2D b, Point2D c) {
@@ -104,74 +127,10 @@ public class GrahamScan {
     }
 
 
-
     private void printPointCollection() {
         System.out.println("Aktualny zestaw punktów w GrahmScan: ");
         for(Point2D elem: pointsCollection)
             System.out.println("    X:" + elem.getX() + "   Y:" + elem.getY());
     }
 
-    public static void main(String [] args) {
-
-        Point2D [] testPoints = new Point2D[5];
-        testPoints[0] = new Point2D.Double(2, 3);
-        testPoints[1] = new Point2D.Double(12, 4);
-        testPoints[2] = new Point2D.Double(8, 2);
-        testPoints[3] = new Point2D.Double(9, 3);
-        testPoints[4] = new Point2D.Double(0, 53);
-
-        try {
-            GrahamScan testGrahamScan = new GrahamScan(testPoints);
-            System.out.println(testGrahamScan);
-
-            testGrahamScan.printPointCollection();
-            Point2D minimalY = testGrahamScan.pullOutMinimalYXpoint();
-            System.out.println("Minimalny pkt: (" + minimalY.getX() + ", " + minimalY.getY() + ")");
-            testGrahamScan.printPointCollection();
-
-
-        } catch (ToFewPointsToFindConvexHullException ex) {
-            System.out.println("W podanej przez ciebie tablicy jest mniej niż 3 punkty, przez co nie można znaleźć otoczki wypukłej!");
-            ex.printStackTrace();
-        }
-
-        Point2D [] testPoints2 = new Point2D[3];
-        /*testPoints2[0] = new Point2D.Double(5, 7);
-        testPoints2[1] = new Point2D.Double(0, 5);
-        testPoints2[2] = new Point2D.Double(3, 8);
-        testPoints2[3] = new Point2D.Double(9, 10);
-        testPoints2[4] = new Point2D.Double(7, 5);
-        testPoints2[5] = new Point2D.Double(10, 2);
-        testPoints2[6] = new Point2D.Double(1, 1);/*
-        */
-        
-        testPoints2[0] = new Point2D.Double(4, 16);
-        testPoints2[1] = new Point2D.Double(17, 13);
-        testPoints2[2] = new Point2D.Double(15, 9);
-        
-
-        try {
-            System.out.println();
-            System.out.println();
-            GrahamScan testGrahamScan = new GrahamScan(testPoints2);
-            testGrahamScan.printPointCollection();
-
-            System.out.println("#####Znalezione pkt otoczki to: ##########");
-            ArrayList <Point2D> findedElements = testGrahamScan.findHull();
-            for( Point2D each : findedElements) {
-                System.out.println("    (" + each.getX() + ", " + each.getY() + ")");
-            }
-
-
-        } catch (ToFewPointsToFindConvexHullException ex) {
-            System.out.println("W podanej przez ciebie tablicy jest mniej niż 3 punkty, przez co nie można znaleźć otoczki wypukłej!");
-            ex.printStackTrace();
-        }
-
-
-
-
-
-
-    }
 }

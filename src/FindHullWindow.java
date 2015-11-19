@@ -1,5 +1,8 @@
 
+import ProjectExceptions.ToFewPointsToFindConvexHullException;
+import java.awt.Color;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -20,8 +23,13 @@ public class FindHullWindow extends javax.swing.JFrame {
     public FindHullWindow(ForwardingDataPackage forwaredDataPackage) {
         initComponents();
         FindHullWindowLogic.setImportedPointsFromReader(forwaredDataPackage.getPointsCollection());
-        FindHullWindowLogic.drawPointsOnChart(jPanelPointChart);
-       
+        FindHullWindowLogic.drawPointsOnChart(jPanelPointChart, null);
+        try {
+            findHull = new GrahamScan(FindHullWindowLogic.getImportedPointsFromReader());
+        } catch (ToFewPointsToFindConvexHullException e) {
+            JOptionPane.showMessageDialog(this, "Wczytano zbyt mało puntków, przez co program może działać nieprawidłowo. Do poprawnego działania sugerowane jest ponowne uruchomienie programu.", 
+                    "Poważny wewnętrzny błąd programu", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**
@@ -33,6 +41,7 @@ public class FindHullWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanelPointChart = new javax.swing.JPanel();
         jPanelGlobalButtons = new javax.swing.JPanel();
         jPanelAddPoints = new javax.swing.JPanel();
@@ -77,6 +86,11 @@ public class FindHullWindow extends javax.swing.JFrame {
         );
 
         jButtonNextWindow.setText("Przejdź dalej");
+        jButtonNextWindow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonNextWindowActionPerformed(evt);
+            }
+        });
 
         jButtonPreviosWindow.setText("Cofnij");
         jButtonPreviosWindow.addActionListener(new java.awt.event.ActionListener() {
@@ -130,7 +144,7 @@ public class FindHullWindow extends javax.swing.JFrame {
                 java.lang.Integer.class, java.lang.Double.class, java.lang.Double.class
             };
             boolean[] canEdit = new boolean [] {
-                false, true, true
+                false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -151,12 +165,30 @@ public class FindHullWindow extends javax.swing.JFrame {
         });
 
         jButtonStopFindingHull.setText("Stop");
+        jButtonStopFindingHull.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonStopFindingHullActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Ilość iteracji w pojedyńczym kroku:");
 
+        jSpinner1.setValue(1);
+
         jButtonFindingHullNextStep.setText("Kolejny krok");
+        jButtonFindingHullNextStep.setEnabled(false);
+        jButtonFindingHullNextStep.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonFindingHullNextStepActionPerformed(evt);
+            }
+        });
 
         jButtonFindingHullFinish.setText("Idź do końca");
+        jButtonFindingHullFinish.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonFindingHullFinishActionPerformed(evt);
+            }
+        });
 
         jButtonFindingHullReset.setText("Zresetuj znajdywanie otoczki");
         jButtonFindingHullReset.addActionListener(new java.awt.event.ActionListener() {
@@ -255,11 +287,20 @@ public class FindHullWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonStartFindingHullActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStartFindingHullActionPerformed
-        // TODO add your handling code here:
+
+        jButtonStartFindingHull.setBackground(Color.green);
+        jButtonFindingHullNextStep.setEnabled(true);
+        jButtonStartFindingHull.setEnabled(false);
+        findHull.initGrahamScanAlgorithm();
+        FindHullWindowLogic.drawPointsOnChart(jPanelPointChart, findHull.getConvexHull());
     }//GEN-LAST:event_jButtonStartFindingHullActionPerformed
 
     private void jButtonFindingHullResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFindingHullResetActionPerformed
-        // TODO add your handling code here:
+
+        jButtonFindingHullNextStep.setEnabled(false);
+        jButtonStartFindingHull.setEnabled(true);
+        jButtonStopFindingHull.setEnabled(true);
+        //TODO zrób to potem!!!!
     }//GEN-LAST:event_jButtonFindingHullResetActionPerformed
 
     private void jButtonPreviosWindowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPreviosWindowActionPerformed
@@ -271,6 +312,47 @@ public class FindHullWindow extends javax.swing.JFrame {
         this.setVisible(false);
         dispose();
     }//GEN-LAST:event_jButtonPreviosWindowActionPerformed
+
+    private void jButtonNextWindowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNextWindowActionPerformed
+
+        if(FindHullWindowLogic.isConvexHullFinded()) {
+            //TODO go to next window, but fist make package to transfer data
+        } else {
+            JOptionPane.showMessageDialog(this, "Wpierw musisz dokończyć znajdywanie otoczki. Naciśnij przycisk \"" +
+                    jButtonFindingHullFinish.getText() + "\" by przejść do końca znajdywania.", 
+                    "Nie można przejść dalej", JOptionPane.WARNING_MESSAGE);
+            jButtonFindingHullFinish.setBackground(Color.red);
+        }
+    }//GEN-LAST:event_jButtonNextWindowActionPerformed
+
+    private void jButtonFindingHullNextStepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFindingHullNextStepActionPerformed
+
+        if(!findHull.makeFewStepsInGrahamScan((int) jSpinner1.getValue())) {
+            //zakończono znajdywanie
+            FindHullWindowLogic.drawPointsOnChart(jPanelPointChart, findHull.getConvexHull());
+            jButtonStartFindingHull.setEnabled(false);
+            jButtonStopFindingHull.setEnabled(false);
+            jButtonFindingHullNextStep.setEnabled(false);
+            JOptionPane.showMessageDialog(this, "Zakończono znajdywanie otoczki! Można przejść teraz do następnego okna.", 
+                    "Sukces!", JOptionPane.INFORMATION_MESSAGE);
+        }
+        FindHullWindowLogic.drawPointsOnChart(jPanelPointChart, findHull.getConvexHull());
+    }//GEN-LAST:event_jButtonFindingHullNextStepActionPerformed
+
+    private void jButtonStopFindingHullActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStopFindingHullActionPerformed
+
+        jButtonStartFindingHull.setBackground(null);
+        jButtonFindingHullNextStep.setEnabled(false);
+        jButtonStartFindingHull.setEnabled(true);
+    }//GEN-LAST:event_jButtonStopFindingHullActionPerformed
+
+    private void jButtonFindingHullFinishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFindingHullFinishActionPerformed
+
+        jButtonStartFindingHull.setEnabled(false);
+        jButtonStopFindingHull.setEnabled(false);
+        jButtonFindingHullNextStep.setEnabled(false);
+        jButtonFindingHullFinish.setBackground(null);
+    }//GEN-LAST:event_jButtonFindingHullFinishActionPerformed
 
     /**
      * @param args the command line arguments
@@ -306,7 +388,8 @@ public class FindHullWindow extends javax.swing.JFrame {
             }
         });
     }
-
+    
+    private GrahamScan findHull;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonFindingHullFinish;
     private javax.swing.JButton jButtonFindingHullNextStep;
@@ -323,6 +406,7 @@ public class FindHullWindow extends javax.swing.JFrame {
     private javax.swing.JPanel jPanelPointChart;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSpinner jSpinner1;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 }

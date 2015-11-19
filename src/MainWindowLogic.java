@@ -141,6 +141,7 @@ public class MainWindowLogic {
     }
     
     static void drawXYChart(JPanel panelWhenInside, JTable pointsCollector) {
+        panelWhenInside.removeAll();
         panelWhenInside.setLayout(new java.awt.BorderLayout());
 
         //TODO 

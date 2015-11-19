@@ -144,11 +144,25 @@ public class MainWindow extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        jTable1.addAncestorListener(new javax.swing.event.AncestorListener() {
+            public void ancestorMoved(javax.swing.event.AncestorEvent evt) {
+                jTable1AncestorMoved(evt);
+            }
+            public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
+            }
+            public void ancestorRemoved(javax.swing.event.AncestorEvent evt) {
+            }
+        });
         jTable1.addInputMethodListener(new java.awt.event.InputMethodListener() {
             public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
                 jTable1InputMethodTextChanged(evt);
             }
             public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+            }
+        });
+        jTable1.addVetoableChangeListener(new java.beans.VetoableChangeListener() {
+            public void vetoableChange(java.beans.PropertyChangeEvent evt)throws java.beans.PropertyVetoException {
+                jTable1VetoableChange(evt);
             }
         });
         jScrollPane1.setViewportView(jTable1);
@@ -246,6 +260,8 @@ public class MainWindow extends javax.swing.JFrame {
         MainWindowLogic.addRowToTable(jTable1);
     }//GEN-LAST:event_jButtonAddPointActionPerformed
     
+    
+    //nie jest używane chwilowo, bo sprawiało ze ise nakładały
     private void jTableValueChangedInitListener() {
         jTable1.getModel().addTableModelListener(new TableModelListener() {
             @Override
@@ -299,7 +315,7 @@ public class MainWindow extends javax.swing.JFrame {
         Point2D [] forwardThisPoints = MainWindowLogic.rewritePointsTableWitoutDuplicats(jTable1);
         
         if( forwardThisPoints.length < 3) {
-            JOptionPane.showMessageDialog(this, "Aby móc znaleźć otoczkę potrzebne są conjamiej 3 punkty!", "Błąd - zbyt mało punktów!", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Aby móc znaleźć otoczkę potrzebne są conjamiej 3 punkty!", "Błąd - zbyt mało punktów!", JOptionPane.WARNING_MESSAGE);
         } 
         else {
             ForwardingDataPackage dataForwarding = new ForwardingDataPackage();
@@ -316,6 +332,15 @@ public class MainWindow extends javax.swing.JFrame {
     private void jTable1InputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_jTable1InputMethodTextChanged
         // TODO add your handling code here:
     }//GEN-LAST:event_jTable1InputMethodTextChanged
+
+    private void jTable1AncestorMoved(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_jTable1AncestorMoved
+        // TODO add your handling code here:
+   
+    }//GEN-LAST:event_jTable1AncestorMoved
+
+    private void jTable1VetoableChange(java.beans.PropertyChangeEvent evt)throws java.beans.PropertyVetoException {//GEN-FIRST:event_jTable1VetoableChange
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTable1VetoableChange
 
     /**
      * @param args the command line arguments
