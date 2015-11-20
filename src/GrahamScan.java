@@ -56,6 +56,16 @@ public class GrahamScan {
         
     }
     
+    public void goToEndOfFindingHull() {
+        while(true) {
+            if( !makeOneStepInGrahamScanAlgoritm() ) {
+                convexHull.add(convexHull.get(0)); //to make nice loop on chart while drawning
+                break;
+                
+            }
+        }
+    }
+    
     private boolean makeOneStepInGrahamScanAlgoritm() {
         while( calculateDetBySarrusMethod(convexHull.get(convexHull.size() - 2),
                                           convexHull.get(convexHull.size() - 1),

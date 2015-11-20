@@ -8,42 +8,85 @@ import java.util.Random;
  * Created by drapek on 01.11.15.
  */
 public class CalculateAreaMonteCarlo {
-    ArrayList <Point2D> fieldBoundaryPoints;
-
+    private ArrayList <Point2D> fieldBoundaryPoints;
+    private ArrayList <Point2D> randomPointsHits;
+    private ArrayList <Point2D> randomPointsMiss;
+    
+    
     Point2D minPointOuterRectangle;
     Point2D maxPointOuterRectangle;
     Random rnd = new Random();
 
-    int randomSamplesNumber = 200;
-    int hitsNumber;
+    private int overallRandomSamplesNumber = 1000;
+    private int oneStepRandomSamplesNumber = 200;
+    private int summaryRandomSamplesNumberAtMoment = 0;
+    private int hitsNumber = 0;
+    private int missNumber = 0;
 
 
-    public CalculateAreaMonteCarlo(ArrayList <Point2D> fieldBoundaryPoints) throws ToFewPointsToMakePlygon {
-        if( fieldBoundaryPoints.size() != 0)
-            this.fieldBoundaryPoints = fieldBoundaryPoints;
-        else throw new ToFewPointsToMakePlygon();
-
+    public CalculateAreaMonteCarlo(ArrayList <Point2D> fieldBoundaryPoints) {
+        
+        this.fieldBoundaryPoints = fieldBoundaryPoints;
+        randomPointsHits = new ArrayList<>();
+        randomPointsMiss = new ArrayList<>();
+        
         minPointOuterRectangle = findMinimalPointLimitingFigure();
         maxPointOuterRectangle = findMaximalPointLimitingFigure();
     }
 
-    public void setNumerOfSamples(int naturalNumber) {
-        if( naturalNumber < 1)
-            System.out.println("Nie mogłem zmienić liczby powtórzeń losowań próbek na liczbę ujemną!");
-        else
-            randomSamplesNumber = naturalNumber;
+    public void setOverallNumerOfSamples(int naturalNumber) {
+            overallRandomSamplesNumber = naturalNumber;
     }
-
-    public double calculateArea() {
-        hitsNumber = 0;
-
-        for(int i = 0; i < randomSamplesNumber; i++) {
-            if(isInsideFigure(randomPoint()))
-                hitsNumber++;
-        }
-
+    
+    public void setOneStepRandomSamplesNumber(int naturalNumber) {
+            oneStepRandomSamplesNumber = naturalNumber;
+    }
+    
+    public int getHitsNumber() {
+        return hitsNumber;
+    }
+    
+    public int getMissNumber() {
+        return missNumber;
+    }
+    
+    public ArrayList <Point2D> getHitsArrayList() {
+        return randomPointsHits;
+    }
+    
+    public ArrayList <Point2D> getMissArrayList() {
+        return randomPointsMiss;
+    }
+    
+    public double getAreaAtThisMoment() {
         double outerRectangleArea = (maxPointOuterRectangle.getX() - minPointOuterRectangle.getX()) * (maxPointOuterRectangle.getY() - minPointOuterRectangle.getY());
-        return (double) hitsNumber / (double) randomSamplesNumber * outerRectangleArea;
+        return (double) hitsNumber / (double) summaryRandomSamplesNumberAtMoment * outerRectangleArea;
+    }
+    
+    /**
+     * 
+     * @return false if algoritm make overallRandomSamplesNumber steps
+     */
+    public boolean oneStepInCountingArea() {
+        for(int i = 0; i < oneStepRandomSamplesNumber; i++, summaryRandomSamplesNumberAtMoment++) {
+            if(summaryRandomSamplesNumberAtMoment >= overallRandomSamplesNumber)
+                return false;
+            Point2D rndPnt = randomPoint();
+            if(isInsideFigure(rndPnt)) {
+                hitsNumber++;
+                randomPointsHits.add(rndPnt);
+            } else {
+                missNumber++;
+                randomPointsMiss.add(rndPnt);
+            }
+        }
+        
+        return true;
+    }
+    
+    public void goToTheEndOfAlgoritm() {
+        while(oneStepInCountingArea())
+            ;
     }
 
     private boolean isInsideFigure(Point2D check) {
@@ -66,7 +109,7 @@ public class CalculateAreaMonteCarlo {
 
     private Point2D findMinimalPointLimitingFigure() {
         double minX = fieldBoundaryPoints.get(0).getX();
-        double minY = fieldBoundaryPoints.get(0).getY();;
+        double minY = fieldBoundaryPoints.get(0).getY();
         for( Point2D each : fieldBoundaryPoints) {
             if( each.getX() < minX )
                 minX = each.getX();
@@ -90,28 +133,4 @@ public class CalculateAreaMonteCarlo {
         return new Point2D.Double(maxX, maxY);
     }
 
-    public static void main(String [] args) {
-        ArrayList <Point2D> testsPoints = new ArrayList<>();
-        testsPoints.add(new Point2D.Double(1, 1));
-        testsPoints.add(new Point2D.Double(10, 2));
-        testsPoints.add(new Point2D.Double(9, 10));
-        testsPoints.add(new Point2D.Double(3, 8));
-        testsPoints.add(new Point2D.Double(0, 5));
-
-        try {
-            CalculateAreaMonteCarlo testCalculateArea = new CalculateAreaMonteCarlo(testsPoints);
-
-            System.out.println("##########Test isInsideFigure#########");
-            System.out.println("(7, 5) jest w figurze: " + testCalculateArea.isInsideFigure(new Point2D.Double(7, 5)));
-            System.out.println("(10, 11) jest w figurze: " + testCalculateArea.isInsideFigure(new Point2D.Double(10, 11)));
-
-            System.out.println("##########Test liczenia pola powierzchni#########");
-            System.out.println("Pole podanje figury to: " + testCalculateArea.calculateArea());
-
-        } catch (ToFewPointsToMakePlygon toFewPointsToMakePlygon) {
-            toFewPointsToMakePlygon.printStackTrace();
-        }
-
-
-    }
 }

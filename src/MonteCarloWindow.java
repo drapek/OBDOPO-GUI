@@ -1,3 +1,9 @@
+
+import ProjectExceptions.ToFewPointsToMakePlygon;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import javax.swing.JFrame;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -13,8 +19,14 @@ public class MonteCarloWindow extends javax.swing.JFrame {
     /**
      * Creates new form MainWindow
      */
-    public MonteCarloWindow() {
+    public MonteCarloWindow(ForwardingDataPackage forwaredPackage) {
         initComponents();
+        MonteCarloWindowLogic.setForwardedData(forwaredPackage);
+        monteCarloCalc = new CalculateAreaMonteCarlo(forwaredPackage.getConvexHullPoints());
+        jLabelSuccessInfo.setVisible(false);
+        
+        MonteCarloWindowLogic.drawPointsOnChart(jPanelPointChart, forwaredPackage.getConvexHullPoints(), new ArrayList<>(), new ArrayList<>());
+        
     }
 
     /**
@@ -35,7 +47,6 @@ public class MonteCarloWindow extends javax.swing.JFrame {
         jLabelTitleHullPanel = new javax.swing.JLabel();
         jLabelRandomPointsByStep = new javax.swing.JLabel();
         jSpinnerRndNmbByStep = new javax.swing.JSpinner();
-        jToggleButtonStart = new javax.swing.JToggleButton();
         jButtonNextStep = new javax.swing.JButton();
         jLabelNmbInnerPointsInfo = new javax.swing.JLabel();
         jLabelNmbInnerPointsValue = new javax.swing.JLabel();
@@ -48,6 +59,7 @@ public class MonteCarloWindow extends javax.swing.JFrame {
         jLabelRandomPoints = new javax.swing.JLabel();
         jSpinnerRndNmb = new javax.swing.JSpinner();
         jLabelSuccessInfo = new javax.swing.JLabel();
+        jButtonStart = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -76,8 +88,18 @@ public class MonteCarloWindow extends javax.swing.JFrame {
         );
 
         jButtonClose.setText("Zamknij");
+        jButtonClose.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonCloseActionPerformed(evt);
+            }
+        });
 
         jButtonPreviosWindow.setText("Cofnij");
+        jButtonPreviosWindow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonPreviosWindowActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelGlobalButtonsLayout = new javax.swing.GroupLayout(jPanelGlobalButtons);
         jPanelGlobalButtons.setLayout(jPanelGlobalButtonsLayout);
@@ -114,42 +136,62 @@ public class MonteCarloWindow extends javax.swing.JFrame {
 
         jLabelRandomPointsByStep.setText("Ilość randomowych pkt w kroku: ");
 
-        jToggleButtonStart.setText("Start");
-        jToggleButtonStart.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleButtonStartActionPerformed(evt);
-            }
-        });
+        jSpinnerRndNmbByStep.setValue(100);
 
         jButtonNextStep.setText("Kolejny krok");
+        jButtonNextStep.setEnabled(false);
         jButtonNextStep.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonNextStepActionPerformed(evt);
             }
         });
 
+        jLabelNmbInnerPointsInfo.setFont(new java.awt.Font("Dialog", 1, 11)); // NOI18N
+        jLabelNmbInnerPointsInfo.setForeground(new java.awt.Color(0, 153, 0));
         jLabelNmbInnerPointsInfo.setText("Ilość pkt wewnątrz otoczki: ");
 
         jLabelNmbInnerPointsValue.setText("0");
 
+        jLabelNmbOutterPointsInfo.setFont(new java.awt.Font("Dialog", 1, 11)); // NOI18N
+        jLabelNmbOutterPointsInfo.setForeground(new java.awt.Color(204, 0, 0));
         jLabelNmbOutterPointsInfo.setText("Ilość pkt na zewnątrz otoczki: ");
 
         jLabelNmbOutterPointsValue.setText("0");
 
         jButtonGoToEnd.setText("Idź do końca");
+        jButtonGoToEnd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonGoToEndActionPerformed(evt);
+            }
+        });
 
         jButtonResetMonteCarlo.setText("Zresetuj obliczanie pola");
+        jButtonResetMonteCarlo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonResetMonteCarloActionPerformed(evt);
+            }
+        });
 
+        jLabelAreaInfo.setFont(new java.awt.Font("Dialog", 1, 11)); // NOI18N
         jLabelAreaInfo.setText("Pole obliczonej figury: ");
 
         jLabelAreaValue.setText("0");
 
         jLabelRandomPoints.setText("Ilość wyszystkich punktów: ");
 
+        jSpinnerRndNmb.setValue(1000);
+
         jLabelSuccessInfo.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabelSuccessInfo.setForeground(new java.awt.Color(0, 204, 0));
         jLabelSuccessInfo.setText("Zakończono!");
         jLabelSuccessInfo.setToolTipText("");
+
+        jButtonStart.setText("Start");
+        jButtonStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonStartActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelAreaCountingLayout = new javax.swing.GroupLayout(jPanelAreaCounting);
         jPanelAreaCounting.setLayout(jPanelAreaCountingLayout);
@@ -160,40 +202,45 @@ public class MonteCarloWindow extends javax.swing.JFrame {
                 .addComponent(jLabelTitleHullPanel)
                 .addGap(55, 55, 55))
             .addGroup(jPanelAreaCountingLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanelAreaCountingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabelNmbInnerPointsInfo)
-                    .addGroup(jPanelAreaCountingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jLabelNmbInnerPointsValue, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(jPanelAreaCountingLayout.createSequentialGroup()
-                            .addGroup(jPanelAreaCountingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(jPanelAreaCountingLayout.createSequentialGroup()
-                                    .addComponent(jLabelAreaInfo)
-                                    .addGap(53, 53, 53))
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelAreaCountingLayout.createSequentialGroup()
-                                    .addComponent(jLabelNmbOutterPointsInfo)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
-                            .addGroup(jPanelAreaCountingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabelAreaValue)
-                                .addComponent(jLabelNmbOutterPointsValue, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addComponent(jLabelSuccessInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanelAreaCountingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanelAreaCountingLayout.createSequentialGroup()
-                            .addComponent(jToggleButtonStart, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(jButtonNextStep, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanelAreaCountingLayout.createSequentialGroup()
-                            .addComponent(jButtonGoToEnd)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButtonResetMonteCarlo)))
                     .addGroup(jPanelAreaCountingLayout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(jPanelAreaCountingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabelRandomPoints)
-                            .addComponent(jLabelRandomPointsByStep))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanelAreaCountingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSpinnerRndNmbByStep, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jSpinnerRndNmb, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(jPanelAreaCountingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addGroup(jPanelAreaCountingLayout.createSequentialGroup()
+                                    .addComponent(jLabelNmbInnerPointsInfo)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jLabelNmbInnerPointsValue, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jLabelAreaValue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(jPanelAreaCountingLayout.createSequentialGroup()
+                                    .addGroup(jPanelAreaCountingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanelAreaCountingLayout.createSequentialGroup()
+                                            .addComponent(jLabelAreaInfo)
+                                            .addGap(53, 53, 53))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelAreaCountingLayout.createSequentialGroup()
+                                            .addComponent(jLabelNmbOutterPointsInfo)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                                    .addComponent(jLabelNmbOutterPointsValue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addGroup(jPanelAreaCountingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanelAreaCountingLayout.createSequentialGroup()
+                                    .addComponent(jButtonStart, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(jButtonNextStep, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanelAreaCountingLayout.createSequentialGroup()
+                                    .addComponent(jButtonGoToEnd)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jButtonResetMonteCarlo)))
+                            .addGroup(jPanelAreaCountingLayout.createSequentialGroup()
+                                .addGroup(jPanelAreaCountingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabelRandomPoints)
+                                    .addComponent(jLabelRandomPointsByStep))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanelAreaCountingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jSpinnerRndNmbByStep, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
+                                    .addComponent(jSpinnerRndNmb)))))
+                    .addGroup(jPanelAreaCountingLayout.createSequentialGroup()
+                        .addGap(132, 132, 132)
+                        .addComponent(jLabelSuccessInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanelAreaCountingLayout.setVerticalGroup(
@@ -211,8 +258,8 @@ public class MonteCarloWindow extends javax.swing.JFrame {
                     .addComponent(jSpinnerRndNmbByStep, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanelAreaCountingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jToggleButtonStart)
-                    .addComponent(jButtonNextStep))
+                    .addComponent(jButtonNextStep)
+                    .addComponent(jButtonStart))
                 .addGap(8, 8, 8)
                 .addGroup(jPanelAreaCountingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonGoToEnd)
@@ -226,12 +273,12 @@ public class MonteCarloWindow extends javax.swing.JFrame {
                     .addComponent(jLabelNmbOutterPointsInfo)
                     .addComponent(jLabelNmbOutterPointsValue))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanelAreaCountingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabelAreaInfo)
-                    .addComponent(jLabelAreaValue))
-                .addGap(18, 18, 18)
+                .addComponent(jLabelAreaInfo)
+                .addGap(7, 7, 7)
+                .addComponent(jLabelAreaValue)
+                .addGap(38, 38, 38)
                 .addComponent(jLabelSuccessInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(142, Short.MAX_VALUE))
+                .addContainerGap(101, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -265,14 +312,72 @@ public class MonteCarloWindow extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jToggleButtonStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButtonStartActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jToggleButtonStartActionPerformed
-
     private void jButtonNextStepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNextStepActionPerformed
-        // TODO add your handling code here:
+       monteCarloCalc.setOneStepRandomSamplesNumber( (int) jSpinnerRndNmbByStep.getValue());
+       if( !monteCarloCalc.oneStepInCountingArea() ) {
+           actionAfterCountArea();
+           return;
+       }
+        updateAllWindowStatistics();
+        MonteCarloWindowLogic.drawPointsOnChart(jPanelPointChart, MonteCarloWindowLogic.getForwardedData().getConvexHullPoints(), 
+                monteCarloCalc.getHitsArrayList(), monteCarloCalc.getMissArrayList());
+       
     }//GEN-LAST:event_jButtonNextStepActionPerformed
 
+    private void jButtonPreviosWindowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPreviosWindowActionPerformed
+
+        FindHullWindow newWindow = new FindHullWindow(MonteCarloWindowLogic.getForwardedData());
+        newWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        newWindow.setVisible(true);
+        this.setVisible(false);
+        dispose();
+    }//GEN-LAST:event_jButtonPreviosWindowActionPerformed
+
+    private void jButtonCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCloseActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_jButtonCloseActionPerformed
+
+    private void jButtonGoToEndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGoToEndActionPerformed
+
+       monteCarloCalc.goToTheEndOfAlgoritm();
+       updateAllWindowStatistics();
+       MonteCarloWindowLogic.drawPointsOnChart(jPanelPointChart, MonteCarloWindowLogic.getForwardedData().getConvexHullPoints(), 
+                monteCarloCalc.getHitsArrayList(), monteCarloCalc.getMissArrayList());
+       actionAfterCountArea();
+    }//GEN-LAST:event_jButtonGoToEndActionPerformed
+
+    private void jButtonStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStartActionPerformed
+        jButtonNextStep.setEnabled(true);
+        monteCarloCalc.setOverallNumerOfSamples((int) jSpinnerRndNmb.getValue());
+        monteCarloCalc.setOneStepRandomSamplesNumber( (int) jSpinnerRndNmbByStep.getValue());
+        //to make one step at first    
+        jButtonNextStepActionPerformed(evt);
+        jButtonStart.setEnabled(false);
+    }//GEN-LAST:event_jButtonStartActionPerformed
+
+    private void jButtonResetMonteCarloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResetMonteCarloActionPerformed
+        jButtonGoToEnd.setEnabled(true);
+        jButtonStart.setEnabled(true);
+        jButtonNextStep.setEnabled(false);
+        jLabelSuccessInfo.setVisible(false);
+        monteCarloCalc = new CalculateAreaMonteCarlo(MonteCarloWindowLogic.forwardedData.getConvexHullPoints());
+        updateAllWindowStatistics();
+    }//GEN-LAST:event_jButtonResetMonteCarloActionPerformed
+    
+    private void updateAllWindowStatistics() {
+        jLabelNmbInnerPointsValue.setText(monteCarloCalc.getHitsNumber() + "");
+        jLabelNmbOutterPointsValue.setText(monteCarloCalc.getMissNumber() + "");
+        jLabelAreaValue.setText(monteCarloCalc.getAreaAtThisMoment() + "");
+        
+    }
+    
+    private void actionAfterCountArea() {
+       jButtonGoToEnd.setEnabled(false);
+       jButtonNextStep.setEnabled(false);
+       jButtonStart.setEnabled(false);
+       jLabelSuccessInfo.setVisible(true);
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -307,13 +412,15 @@ public class MonteCarloWindow extends javax.swing.JFrame {
             }
         });
     }
-
+    
+    CalculateAreaMonteCarlo monteCarloCalc;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonClose;
     private javax.swing.JButton jButtonGoToEnd;
     private javax.swing.JButton jButtonNextStep;
     private javax.swing.JButton jButtonPreviosWindow;
     private javax.swing.JButton jButtonResetMonteCarlo;
+    private javax.swing.JButton jButtonStart;
     private javax.swing.JLabel jLabelAreaInfo;
     private javax.swing.JLabel jLabelAreaValue;
     private javax.swing.JLabel jLabelNmbInnerPointsInfo;
@@ -330,6 +437,5 @@ public class MonteCarloWindow extends javax.swing.JFrame {
     private javax.swing.JPanel jPanelPointChart;
     private javax.swing.JSpinner jSpinnerRndNmb;
     private javax.swing.JSpinner jSpinnerRndNmbByStep;
-    private javax.swing.JToggleButton jToggleButtonStart;
     // End of variables declaration//GEN-END:variables
 }

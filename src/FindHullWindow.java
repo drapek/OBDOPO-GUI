@@ -1,6 +1,8 @@
 
 import ProjectExceptions.ToFewPointsToFindConvexHullException;
 import java.awt.Color;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -23,7 +25,18 @@ public class FindHullWindow extends javax.swing.JFrame {
     public FindHullWindow(ForwardingDataPackage forwaredDataPackage) {
         initComponents();
         FindHullWindowLogic.setImportedPointsFromReader(forwaredDataPackage.getPointsCollection());
-        FindHullWindowLogic.drawPointsOnChart(jPanelPointChart, null);
+        isFindHullInited = false;
+        isHullFinded = false;
+        if( forwaredDataPackage.getConvexHullPoints() == null)
+            FindHullWindowLogic.drawPointsOnChart(jPanelPointChart, null);
+        else {
+            FindHullWindowLogic.drawPointsOnChart(jPanelPointChart, forwaredDataPackage.getConvexHullPoints());
+            jButtonStartFindingHull.setEnabled(false);
+            jButtonFindingHullNextStep.setEnabled(false);
+            jButtonFindingHullFinish.setBackground(null);
+            jButtonFindingHullFinish.setEnabled(false);
+            isHullFinded = true;
+        }
         try {
             findHull = new GrahamScan(FindHullWindowLogic.getImportedPointsFromReader());
         } catch (ToFewPointsToFindConvexHullException e) {
@@ -52,7 +65,6 @@ public class FindHullWindow extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jButtonStartFindingHull = new javax.swing.JButton();
-        jButtonStopFindingHull = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jSpinner1 = new javax.swing.JSpinner();
         jButtonFindingHullNextStep = new javax.swing.JButton();
@@ -164,13 +176,6 @@ public class FindHullWindow extends javax.swing.JFrame {
             }
         });
 
-        jButtonStopFindingHull.setText("Stop");
-        jButtonStopFindingHull.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonStopFindingHullActionPerformed(evt);
-            }
-        });
-
         jLabel1.setText("Ilość iteracji w pojedyńczym kroku:");
 
         jSpinner1.setValue(1);
@@ -212,22 +217,16 @@ public class FindHullWindow extends javax.swing.JFrame {
                                 .addGap(55, 55, 55))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 339, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
                                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(jSpinner1))
                                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                            .addComponent(jButtonFindingHullNextStep, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
-                                            .addComponent(jButtonStartFindingHull, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jButtonStopFindingHull, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addGap(8, 8, 8)
-                                                .addComponent(jButtonFindingHullFinish, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                                        .addComponent(jButtonFindingHullNextStep, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jButtonFindingHullFinish, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(jButtonStartFindingHull, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addContainerGap())))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jButtonFindingHullReset, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -245,9 +244,7 @@ public class FindHullWindow extends javax.swing.JFrame {
                     .addComponent(jLabel1)
                     .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(20, 20, 20)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonStartFindingHull)
-                    .addComponent(jButtonStopFindingHull))
+                .addComponent(jButtonStartFindingHull)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonFindingHullNextStep)
@@ -290,17 +287,33 @@ public class FindHullWindow extends javax.swing.JFrame {
 
         jButtonStartFindingHull.setBackground(Color.green);
         jButtonFindingHullNextStep.setEnabled(true);
-        jButtonStartFindingHull.setEnabled(false);
-        findHull.initGrahamScanAlgorithm();
+        if( !isFindHullInited)
+            findHull.initGrahamScanAlgorithm();
+        isFindHullInited = true;
         FindHullWindowLogic.drawPointsOnChart(jPanelPointChart, findHull.getConvexHull());
+        FindHullWindowLogic.fullfilTableWithConvexHull(jTable1, findHull.getConvexHull());
+        
+        
     }//GEN-LAST:event_jButtonStartFindingHullActionPerformed
 
     private void jButtonFindingHullResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFindingHullResetActionPerformed
 
         jButtonFindingHullNextStep.setEnabled(false);
         jButtonStartFindingHull.setEnabled(true);
-        jButtonStopFindingHull.setEnabled(true);
-        //TODO zrób to potem!!!!
+        jButtonFindingHullFinish.setEnabled(true);
+        jButtonStartFindingHull.setBackground(null);
+        isFindHullInited = false;
+        isHullFinded = false;
+        isFindHullInited = false;
+        FindHullWindowLogic.drawPointsOnChart(jPanelPointChart, null);
+        FindHullWindowLogic.fullfilTableWithConvexHull(jTable1, new ArrayList <Point2D> ());
+        try {
+            findHull = new GrahamScan(FindHullWindowLogic.getImportedPointsFromReader());
+        } catch (ToFewPointsToFindConvexHullException e) {
+            JOptionPane.showMessageDialog(this, "Wczytano zbyt mało puntków, przez co program może działać nieprawidłowo. Do poprawnego działania sugerowane jest ponowne uruchomienie programu.", 
+                    "Poważny wewnętrzny błąd programu", JOptionPane.ERROR_MESSAGE);
+        }
+        
     }//GEN-LAST:event_jButtonFindingHullResetActionPerformed
 
     private void jButtonPreviosWindowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPreviosWindowActionPerformed
@@ -315,8 +328,17 @@ public class FindHullWindow extends javax.swing.JFrame {
 
     private void jButtonNextWindowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNextWindowActionPerformed
 
-        if(FindHullWindowLogic.isConvexHullFinded()) {
+        if(isHullFinded) {
             //TODO go to next window, but fist make package to transfer data
+            ForwardingDataPackage dataForwarding = new ForwardingDataPackage();
+            dataForwarding.setPointsCollection(FindHullWindowLogic.getImportedPointsFromReader());
+            dataForwarding.setConvexHullPoints(findHull.getConvexHull());
+            
+            MonteCarloWindow newWindow = new MonteCarloWindow(dataForwarding);
+            newWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            newWindow.setVisible(true);
+            this.setVisible(false);
+            dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Wpierw musisz dokończyć znajdywanie otoczki. Naciśnij przycisk \"" +
                     jButtonFindingHullFinish.getText() + "\" by przejść do końca znajdywania.", 
@@ -330,28 +352,34 @@ public class FindHullWindow extends javax.swing.JFrame {
         if(!findHull.makeFewStepsInGrahamScan((int) jSpinner1.getValue())) {
             //zakończono znajdywanie
             FindHullWindowLogic.drawPointsOnChart(jPanelPointChart, findHull.getConvexHull());
+            FindHullWindowLogic.fullfilTableWithConvexHull(jTable1, findHull.getConvexHull());
             jButtonStartFindingHull.setEnabled(false);
-            jButtonStopFindingHull.setEnabled(false);
             jButtonFindingHullNextStep.setEnabled(false);
+            jButtonFindingHullFinish.setEnabled(false);
+            isHullFinded = true;
             JOptionPane.showMessageDialog(this, "Zakończono znajdywanie otoczki! Można przejść teraz do następnego okna.", 
                     "Sukces!", JOptionPane.INFORMATION_MESSAGE);
         }
         FindHullWindowLogic.drawPointsOnChart(jPanelPointChart, findHull.getConvexHull());
+        FindHullWindowLogic.fullfilTableWithConvexHull(jTable1, findHull.getConvexHull());
     }//GEN-LAST:event_jButtonFindingHullNextStepActionPerformed
 
-    private void jButtonStopFindingHullActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStopFindingHullActionPerformed
-
-        jButtonStartFindingHull.setBackground(null);
-        jButtonFindingHullNextStep.setEnabled(false);
-        jButtonStartFindingHull.setEnabled(true);
-    }//GEN-LAST:event_jButtonStopFindingHullActionPerformed
-
     private void jButtonFindingHullFinishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFindingHullFinishActionPerformed
-
+        if(!isFindHullInited) {
+            findHull.initGrahamScanAlgorithm();
+        }
+        findHull.goToEndOfFindingHull();
+        FindHullWindowLogic.drawPointsOnChart(jPanelPointChart, findHull.getConvexHull());
+        FindHullWindowLogic.fullfilTableWithConvexHull(jTable1, findHull.getConvexHull());
+        isHullFinded = true;
+        JOptionPane.showMessageDialog(this, "Zakończono znajdywanie otoczki! Można przejść teraz do następnego okna.", 
+                    "Sukces!", JOptionPane.INFORMATION_MESSAGE);
         jButtonStartFindingHull.setEnabled(false);
-        jButtonStopFindingHull.setEnabled(false);
         jButtonFindingHullNextStep.setEnabled(false);
         jButtonFindingHullFinish.setBackground(null);
+        jButtonFindingHullFinish.setEnabled(false);
+        
+        
     }//GEN-LAST:event_jButtonFindingHullFinishActionPerformed
 
     /**
@@ -389,6 +417,8 @@ public class FindHullWindow extends javax.swing.JFrame {
         });
     }
     
+    private boolean isHullFinded;
+    private boolean isFindHullInited;
     private GrahamScan findHull;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonFindingHullFinish;
@@ -397,7 +427,6 @@ public class FindHullWindow extends javax.swing.JFrame {
     private javax.swing.JButton jButtonNextWindow;
     private javax.swing.JButton jButtonPreviosWindow;
     private javax.swing.JButton jButtonStartFindingHull;
-    private javax.swing.JButton jButtonStopFindingHull;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabelTitleHullPanel;
     private javax.swing.JPanel jPanel1;

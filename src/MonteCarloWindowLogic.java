@@ -5,8 +5,6 @@ import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -27,28 +25,27 @@ import org.jfree.util.ShapeUtilities;
  *
  * @author drapek
  */
-public class FindHullWindowLogic {
-    static private Point2D [] importedPointsFromPointsReader;
-    static private boolean isConvexHullFinded = false;
+public class MonteCarloWindowLogic {
+    static ForwardingDataPackage forwardedData;
     
-    static public void setIsConvexHullFinded(boolean newVal) {
-        isConvexHullFinded =  newVal;
+    static public void setForwardedData(ForwardingDataPackage newForwData) {
+        forwardedData = newForwData;
     }
     
-    
-    static void setImportedPointsFromReader( Point2D [] imported) {
-        importedPointsFromPointsReader = imported;
+    static public ForwardingDataPackage getForwardedData() {
+        return forwardedData;
     }
     
-    static Point2D [] getImportedPointsFromReader() {
-        return importedPointsFromPointsReader;
-    }
-    
-    static void drawPointsOnChart(JPanel panelWhenInside, ArrayList <Point2D> convexHull) {
+    static void drawPointsOnChart(JPanel panelWhenInside, ArrayList <Point2D> convexHull, ArrayList <Point2D> hits, ArrayList <Point2D> miss) {
         panelWhenInside.removeAll();
         panelWhenInside.setLayout(new java.awt.BorderLayout());
-        XYSeries seriersAllPoints = new XYSeries("All points");
-        addPointsToSeries(seriersAllPoints);
+        
+        XYSeries seriersHits = new XYSeries("Hits");
+        convertArrayListToXYSeries(seriersHits, hits);
+        
+        XYSeries seriersMiss = new XYSeries("Miss");
+        convertArrayListToXYSeries(seriersMiss, miss);
+        //TODO refactor this, to handling hits, miss and than convex hull
         
         int pairsNumber = 0;
         if( convexHull != null) 
@@ -65,7 +62,8 @@ public class FindHullWindowLogic {
         
         // Add the seriersAllPoints to your data set
         XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(seriersAllPoints);
+        dataset.addSeries(seriersHits);
+        dataset.addSeries(seriersMiss);
         
         for( int i = 0; i < covnexHullDivideOnPiars.length; i++) {
             dataset.addSeries(covnexHullDivideOnPiars[i]);
@@ -87,12 +85,16 @@ public class FindHullWindowLogic {
         final XYPlot plot = chart.getXYPlot();
         ChartPanel chartPanel = new ChartPanel(chart);
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
-        renderer.setSeriesPaint(0, Color.BLACK);
+        renderer.setSeriesPaint(0, Color.GREEN);
         renderer.setSeriesLinesVisible(0, false);
         renderer.setSeriesShape(0, ShapeUtilities.createDiamond(3));
         
-        for( int i = 1; i <= covnexHullDivideOnPiars.length; i++) {
-            renderer.setSeriesPaint(i, Color.red);
+        renderer.setSeriesPaint(1, Color.RED);
+        renderer.setSeriesLinesVisible(1, false);
+        renderer.setSeriesShape(1, ShapeUtilities.createDiamond(3));
+        
+        for( int i = 2; i <= covnexHullDivideOnPiars.length + 1; i++) {
+            renderer.setSeriesPaint(i, Color.black);
             renderer.setSeriesLinesVisible(i, true);
             renderer.setSeriesStroke( i , new BasicStroke( 1.0f ) );
         }
@@ -103,11 +105,6 @@ public class FindHullWindowLogic {
         panelWhenInside.validate();
     }
     
-    static private void addPointsToSeries(XYSeries seriesDestination) {
-        for(Point2D onePoint : importedPointsFromPointsReader) {
-            seriesDestination.add( onePoint.getX() , onePoint.getY());
-        }
-    }
     
     static private void divideOnPairsAndConvertConvexHullIntoSeries(XYSeries [] seriesDestination, ArrayList <Point2D> convexHull) {
         for(int i = 1; i < convexHull.size(); i ++) {
@@ -116,24 +113,9 @@ public class FindHullWindowLogic {
         }
     }
     
-    static public void fullfilTableWithConvexHull( JTable jTableDest, ArrayList <Point2D> convexHull) {
-        DefaultTableModel jTableDestModel = (DefaultTableModel) jTableDest.getModel();
-        jTableDestModel.setRowCount(0);
-        
-        int i = 1;
-        for(Point2D onePoint : convexHull ) {
-            if( i != 1 && areTheSamePoints(onePoint, convexHull.get(0)))
-                break;
-            jTableDestModel.addRow(new Object[] { i + ".", onePoint.getX(), onePoint.getY()  });
-            i++;
+    static private void convertArrayListToXYSeries(XYSeries seriesDestination, ArrayList <Point2D> arrListFrom) {
+        for(Point2D onePoint : arrListFrom) {
+            seriesDestination.add(onePoint.getX(), onePoint.getY());
         }
-        
-    }
-    
-    static private boolean areTheSamePoints(Point2D p1, Point2D p2) {
-        if( p1.getX() == p2.getX() && p1.getY() == p2.getY())
-            return true;
-        else
-            return false;
     }
 }

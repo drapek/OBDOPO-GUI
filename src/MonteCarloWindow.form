@@ -135,11 +135,17 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Zamknij"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonCloseActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonPreviosWindow">
           <Properties>
             <Property name="text" type="java.lang.String" value="Cofnij"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonPreviosWindowActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -161,51 +167,59 @@
                   <EmptySpace min="-2" pref="55" max="-2" attributes="0"/>
               </Group>
               <Group type="102" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabelNmbInnerPointsInfo" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Group type="103" alignment="0" groupAlignment="1" attributes="0">
-                          <Component id="jLabelNmbInnerPointsValue" min="-2" pref="73" max="-2" attributes="0"/>
-                          <Group type="102" alignment="1" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <Component id="jLabelNmbInnerPointsInfo" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="32767" attributes="0"/>
+                                      <Component id="jLabelNmbInnerPointsValue" min="-2" pref="73" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="jLabelAreaValue" max="32767" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Group type="102" alignment="0" attributes="0">
+                                              <Component id="jLabelAreaInfo" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace min="-2" pref="53" max="-2" attributes="0"/>
+                                          </Group>
+                                          <Group type="102" alignment="1" attributes="0">
+                                              <Component id="jLabelNmbOutterPointsInfo" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          </Group>
+                                      </Group>
+                                      <Component id="jLabelNmbOutterPointsValue" max="32767" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabelAreaInfo" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="-2" pref="53" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" alignment="1" attributes="0">
-                                      <Component id="jLabelNmbOutterPointsInfo" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jButtonStart" min="-2" pref="95" max="-2" attributes="0"/>
                                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="jButtonNextStep" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="jButtonGoToEnd" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="jButtonResetMonteCarlo" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jLabelAreaValue" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabelNmbOutterPointsValue" min="-2" pref="73" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="jLabelRandomPoints" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabelRandomPointsByStep" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                      <Component id="jSpinnerRndNmbByStep" pref="126" max="32767" attributes="0"/>
+                                      <Component id="jSpinnerRndNmb" max="32767" attributes="0"/>
+                                  </Group>
                               </Group>
-                          </Group>
-                          <Component id="jLabelSuccessInfo" alignment="1" min="-2" pref="115" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="jToggleButtonStart" min="-2" pref="95" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="jButtonNextStep" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="jButtonGoToEnd" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jButtonResetMonteCarlo" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jLabelRandomPoints" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabelRandomPointsByStep" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jSpinnerRndNmbByStep" min="-2" pref="59" max="-2" attributes="0"/>
-                              <Component id="jSpinnerRndNmb" min="-2" pref="59" max="-2" attributes="0"/>
-                          </Group>
+                          <EmptySpace min="-2" pref="132" max="-2" attributes="0"/>
+                          <Component id="jLabelSuccessInfo" min="-2" pref="115" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
@@ -229,8 +243,8 @@
                   </Group>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jToggleButtonStart" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jButtonNextStep" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jButtonStart" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
@@ -248,13 +262,12 @@
                       <Component id="jLabelNmbOutterPointsValue" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jLabelAreaInfo" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabelAreaValue" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Component id="jLabelAreaInfo" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
+                  <Component id="jLabelAreaValue" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="38" max="-2" attributes="0"/>
                   <Component id="jLabelSuccessInfo" min="-2" pref="53" max="-2" attributes="0"/>
-                  <EmptySpace pref="142" max="32767" attributes="0"/>
+                  <EmptySpace pref="101" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -274,18 +287,14 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JSpinner" name="jSpinnerRndNmbByStep">
-        </Component>
-        <Component class="javax.swing.JToggleButton" name="jToggleButtonStart">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Start"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jToggleButtonStartActionPerformed"/>
-          </Events>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="jSpinnerRndNmbByStep.setValue(100);&#xa;"/>
+          </AuxValues>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonNextStep">
           <Properties>
             <Property name="text" type="java.lang.String" value="Kolejny krok"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonNextStepActionPerformed"/>
@@ -293,6 +302,12 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabelNmbInnerPointsInfo">
           <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Dialog" size="11" style="1"/>
+            </Property>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="0" green="99" red="0" type="rgb"/>
+            </Property>
             <Property name="text" type="java.lang.String" value="Ilo&#x15b;&#x107; pkt wewn&#x105;trz otoczki: "/>
           </Properties>
         </Component>
@@ -303,6 +318,12 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabelNmbOutterPointsInfo">
           <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Dialog" size="11" style="1"/>
+            </Property>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="0" green="0" red="cc" type="rgb"/>
+            </Property>
             <Property name="text" type="java.lang.String" value="Ilo&#x15b;&#x107; pkt na zewn&#x105;trz otoczki: "/>
           </Properties>
         </Component>
@@ -315,14 +336,23 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Id&#x17a; do ko&#x144;ca"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonGoToEndActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonResetMonteCarlo">
           <Properties>
             <Property name="text" type="java.lang.String" value="Zresetuj obliczanie pola"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonResetMonteCarloActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabelAreaInfo">
           <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Dialog" size="11" style="1"/>
+            </Property>
             <Property name="text" type="java.lang.String" value="Pole obliczonej figury: "/>
           </Properties>
         </Component>
@@ -337,6 +367,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JSpinner" name="jSpinnerRndNmb">
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="jSpinnerRndNmb.setValue(1000); "/>
+          </AuxValues>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabelSuccessInfo">
           <Properties>
@@ -349,6 +382,14 @@
             <Property name="text" type="java.lang.String" value="Zako&#x144;czono!"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonStart">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Start"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonStartActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
