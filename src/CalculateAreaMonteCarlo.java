@@ -72,7 +72,7 @@ public class CalculateAreaMonteCarlo {
             if(summaryRandomSamplesNumberAtMoment >= overallRandomSamplesNumber)
                 return false;
             Point2D rndPnt = randomPoint();
-            if(isInsideFigure(rndPnt)) {
+            if(StaticPointChecker.isInsideConvexHull(fieldBoundaryPoints, rndPnt)) {
                 hitsNumber++;
                 randomPointsHits.add(rndPnt);
             } else {
@@ -89,15 +89,6 @@ public class CalculateAreaMonteCarlo {
             ;
     }
 
-    private boolean isInsideFigure(Point2D check) {
-        for (int i = 0, j = fieldBoundaryPoints.size() - 1; i < fieldBoundaryPoints.size(); j = i++) {
-            if ((fieldBoundaryPoints.get(i).getY() > check.getY()) != (fieldBoundaryPoints.get(j).getY() > check.getY()) &&
-                    (check.getX() < (fieldBoundaryPoints.get(j).getX() - fieldBoundaryPoints.get(i).getX()) * (check.getY() - fieldBoundaryPoints.get(i).getY()) / (fieldBoundaryPoints.get(j).getY() - fieldBoundaryPoints.get(i).getY()) + fieldBoundaryPoints.get(i).getX())) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     private Point2D randomPoint() {
         double randX = rnd.nextDouble()*(maxPointOuterRectangle.getX() - minPointOuterRectangle.getX()) + minPointOuterRectangle.getX();
